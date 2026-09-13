@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storie di Matematica</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial', sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin: 5px 0 15px 0;
+            font-size: 2.5rem;
+            text-align: center;
+            text-shadow: 2px 2px #4ea3e3;
+        }
+
+        #titolo-input {
+            width: 100%;
+            max-width: 1500px;
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-shadow: 2px 2px #4ea3e3;
+            border: none;
+            border-bottom: 3px dashed #4ea3e3;
+            background: transparent;
+            padding: 8px;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        #titolo-input:focus {
+            background-color: rgba(255,255,255,0.6);
+            border-radius: 8px;
+        }
+
+        #titolo-input::placeholder {
+            color: #7fa8c9;
+            text-shadow: none;
+        }
+
+        .nome-block {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            border: 4px solid #fd79a8;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .nome-block label {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #d63384;
+            white-space: nowrap;
+        }
+
+        .nome-block input {
+            flex-grow: 1;
+            max-width: 400px;
+            font-size: 1.3rem;
+            padding: 8px 12px;
+            border: 2px dashed #fd79a8;
+            border-radius: 10px;
+            outline: none;
+            background-color: #fff5f9;
+        }
+
+        .nome-block input:focus {
+            border-color: #d63384;
+            background-color: #fff;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 1500px;
+            flex-grow: 1;
+        }
+
+        .block {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            border: 4px solid;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .block-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-align: center;
+            text-transform: uppercase;
+            padding: 5px;
+            border-radius: 8px;
+            color: white;
+        }
+
+        #storia-block { border-color: #ff7675; }
+        #storia-block .block-title { background-color: #ff7675; }
+
+        #domanda-block { border-color: #74b9ff; }
+        #domanda-block .block-title { background-color: #74b9ff; }
+
+        #operazione-block { border-color: #fdcb6e; }
+        #operazione-block .block-title { background-color: #fdcb6e; }
+
+        #risposta-block { border-color: #55efc4; }
+        #risposta-block .block-title { background-color: #00b894; }
+
+        /* Blocco Storia grande e in alto */
+        #storia-block textarea {
+            min-height: 250px;
+        }
+
+        /* Blocco Domanda più piccolo */
+        #domanda-block textarea {
+            min-height: 80px;
+        }
+
+        /* Blocco Risposta */
+        #risposta-block textarea {
+            min-height: 100px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 1.4rem;
+            resize: none;
+            outline: none;
+            user-select: text;
+            background-color: #fafafa;
+        }
+
+        textarea:focus {
+            border-color: #3498db;
+            background-color: #fff;
+        }
+
+        .op-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            height: 100%;
+        }
+
+        .op-grid-sections {
+            display: grid;
+            grid-template-columns: 1fr 1.6fr; /* In colonna a sinistra, Lavagna a destra resa ancora più grande */
+            gap: 15px;
+        }
+
+        @media (max-width: 1100px) {
+            .op-grid-sections {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .op-section {
+            background-color: #fffdf5;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .op-section-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #d35400;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .canvas-tools {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .btn-canvas-tool {
+            background-color: #bdc3c7;
+            color: #2c3e50;
+            border: none;
+            border-radius: 5px;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-canvas-tool.active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .drop-zone-riga {
+            background-color: #fffde7;
+            border: 2px dashed #f1c40f;
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 60px;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        /* Blocco in colonna ingrandito */
+        .drop-zone-colonna-wrapper {
+            background-color: #fffde7;
+            border: 2px dashed #f1c40f;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+            min-height: 180px;
+            align-items: center;
+        }
+
+        /* Griglia colonna ingrandita per renderla più comoda */
+        .drop-zone-colonna {
+            display: grid;
+            grid-template-columns: repeat(9, 48px) 40px repeat(3, 48px) 60px;
+            grid-auto-rows: 48px;
+            gap: 3px;
+            justify-content: center;
+            align-content: center;
+        }
+
+        .header-cell {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #e17055;
+            background-color: #ffeaa7;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: lowercase;
+        }
+
+        .header-cell.comma-header {
+            background-color: #fab1a0;
+            color: #2d3436;
+            font-size: 1.1rem;
+        }
+
+        .header-cell.decimal-header {
+            background-color: #81ecec;
+            color: #2d3436;
+        }
+
+        .header-cell.sign-header {
+            background-color: #a29bfe;
+            color: white;
+            font-size: 0.7rem;
+        }
+
+        .cell-slot {
+            width: 48px;
+            height: 48px;
+            border: 1px dashed #d1c775;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .cell-slot.comma-slot {
+            background-color: #fff0ed;
+            border: 1px solid #fab1a0;
+            color: #e17055;
+            font-size: 1.3rem;
+        }
+
+        .cell-slot.decimal-slot {
+            background-color: #e8f8f5;
+        }
+
+        .cell-slot.sign-slot {
+            border: 2px dashed #6c5ce7;
+            background-color: #f3f0ff;
+        }
+
+        .column-line-row {
+            grid-column: 1 / span 14;
+            height: 3px;
+            background-color: #e17055;
+            align-self: center;
+            margin: 2px 0;
+        }
+
+        /* Lavagna Canvas ancora più grande, spaziosa e imponente */
+        .btn-clear-canvas {
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-clear-canvas:hover {
+            background-color: #d35400;
+        }
+
+        canvas.scratchpad-canvas {
+            width: 100%;
+            height: 420px; /* Aumentata l'altezza della lavagna */
+            border: 2px dashed #fdcb6e;
+            border-radius: 8px;
+            background-color: #fff;
+            touch-action: none;
+            cursor: crosshair;
+        }
+
+        /* Tavolozza degli elementi con bottoni/tessere ingranditi */
+        .elements-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            background-color: #f9f9f9;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .tile {
+            width: 68px;  /* Ancora più grandi */
+            height: 68px; /* Ancora più grandi */
+            background-color: #ffeaa7;
+            border: 2px solid #fdcb6e;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.1rem; /* Font più grande */
+            font-weight: bold;
+            cursor: grab;
+            box-shadow: 0 5px 0 #e17055;
+            touch-action: none;
+        }
+
+        .tile.operator {
+            background-color: #a29bfe;
+            border-color: #6c5ce7;
+            box-shadow: 0 4px 0 #4834d4;
+            color: white;
+        }
+
+        .tile:active {
+            cursor: grabbing;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #e17055;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        .btn {
+            padding: 9px 16px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .btn-verify { background-color: #0984e3; }
+        .btn-clear-op { background-color: #e74c3c; }
+        .btn-clear-all { background-color: #d63031; margin-left: auto; }
+        .btn-jpeg { background-color: #6c5ce7; }
+        .btn:hover { opacity: 0.9; }
+
+        #drive-status {
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+            margin-top: 8px;
+            min-height: 22px;
+        }
+
+        #feedback-msg {
+            font-weight: bold;
+            font-size: 1.05rem;
+            text-align: center;
+            min-height: 25px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📖 Storie di Matematica 🧮</h1>
+
+    <input type="text" id="titolo-input" placeholder="✏️ Scrivi qui il titolo della storia...">
+
+    <div class="container">
+        <!-- 1. BLOCCO STORIA (In alto, grande) -->
+        <div class="block" id="storia-block">
+            <div class="block-title">1. Storia</div>
+            <textarea placeholder="Scrivi qui la storia del problema..."></textarea>
+        </div>
+
+        <!-- 2. BLOCCO DOMANDA (Più piccolo) -->
+        <div class="block" id="domanda-block">
+            <div class="block-title">2. Domanda</div>
+            <textarea placeholder="Scrivi qui la domanda..."></textarea>
+        </div>
+
+        <!-- 3. BLOCCO OPERAZIONE (Con operazioni in colonna a sinistra e lavagna grande a destra) -->
+        <div class="block" id="operazione-block">
+            <div class="block-title">3. Operazione</div>
+            <div class="op-container">
+                
+                <div class="op-grid-sections">
+                    <!-- Colonna Sinistra: Operazioni in colonna -->
+                    <div class="op-section" style="display: flex; flex-direction: column;">
+                        <div class="op-section-title">
+                            <span>⬇️ Operazioni in colonna</span>
+                        </div>
+                        <div class="drop-zone-colonna-wrapper" style="flex-grow: 1;">
+                            <div id="drop-zone-colonna" class="drop-zone-colonna"></div>
+                        </div>
+                    </div>
+
+                    <!-- Colonna Destra: Lavagna grande ingrandita + Spazio Operazione in Riga -->
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Lavagna per divisioni e moltiplicazioni con decimali (Ingrandita) -->
+                        <div class="op-section" style="flex-grow: 1;">
+                            <div class="op-section-title">
+                                <span>✏️ Lavagna per fare divisioni e moltiplicazioni con decimali</span>
+                                <div class="canvas-tools">
+                                    <button id="btn-pen" class="btn-canvas-tool active" onclick="setCanvasMode('pen')">Matita</button>
+                                    <button id="btn-eraser" class="btn-canvas-tool" onclick="setCanvasMode('eraser')">Gomma</button>
+                                    <button class="btn-clear-canvas" onclick="pulisciLavagna()">Pulisci Lavagna</button>
+                                </div>
+                            </div>
+                            <canvas id="scratchpad" class="scratchpad-canvas"></canvas>
+                        </div>
+
+                        <!-- Spazio Operazione in Riga -->
+                        <div class="op-section">
+                            <div class="op-section-title">
+                                <span>➡️ Spazio Operazione in Riga</span>
+                            </div>
+                            <div id="drop-zone-riga" class="drop-zone-riga"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="feedback-msg"></div>
+
+                <!-- Tavolozza degli elementi trascrivibili (con bottoni ingranditi) -->
+                <div class="elements-pool" id="pool">
+                    <div class="tile" draggable="true">0</div>
+                    <div class="tile" draggable="true">1</div>
+                    <div class="tile" draggable="true">2</div>
+                    <div class="tile" draggable="true">3</div>
+                    <div class="tile" draggable="true">4</div>
+                    <div class="tile" draggable="true">5</div>
+                    <div class="tile" draggable="true">6</div>
+                    <div class="tile" draggable="true">7</div>
+                    <div class="tile" draggable="true">8</div>
+                    <div class="tile" draggable="true">9</div>
+                    
+                    <div class="tile operator" draggable="true">+</div>
+                    <div class="tile operator" draggable="true">-</div>
+                    <div class="tile operator" draggable="true">×</div>
+                    <div class="tile operator" draggable="true">:</div>
+                    <div class="tile operator" draggable="true">=</div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-verify" onclick="verificaOperazione()">✔ Verifica l'operazione</button>
+                    <button class="btn btn-clear-op" onclick="pulisciOperazione()">Cancella Operazione</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. BLOCCO RISPOSTA (Sotto il blocco delle operazioni) -->
+        <div class="block" id="risposta-block">
+            <div class="block-title">4. Risposta</div>
+            <textarea placeholder="Scrivi qui la risposta completa..."></textarea>
+        </div>
+
+        <!-- 5. BLOCCO NOME (In fondo alla scheda) -->
+        <div class="nome-block">
+            <label for="nome-input">✍️ Nome:</label>
+            <input type="text" id="nome-input" placeholder="Scrivi qui il tuo nome...">
+        </div>
+    </div>
+
+    <div style="width: 100%; max-width: 1500px; margin-top: 15px; display: flex; flex-wrap: wrap;">
+        <button class="btn btn-jpeg" onclick="fineFaiJpeg()">📸 Fine fai .jpeg</button>
+        <button class="btn btn-clear-all" onclick="pulisciTutto()">🗑️ Svuota Tutta la Scheda</button>
+    </div>
+    <div id="drive-status" style="width: 100%; max-width: 1500px;"></div>
+
+    <script>
+        let tentativiErrati = 0;
+        const marche = ["hM", "daM", "uM", "hk", "dak", "uk", "h", "da", "u"];
+
+        // Inizializzazione della griglia in colonna con 1 sola riga per il risultato
+        function inizializzaGrigliaColonna() {
+            const gridDiv = document.getElementById('drop-zone-colonna');
+            gridDiv.innerHTML = '';
+
+            // 1. Intestazioni marche intere (12) + Virgola fissa (1) + d, c, m (3) + Segno (1) = 17 totali
+            marche.forEach(m => {
+                let hCell = document.createElement('div');
+                hCell.className = 'header-cell';
+                hCell.innerText = m;
+                gridDiv.appendChild(hCell);
+            });
+
+            // Colonna virgola fissa di intestazione
+            let hComma = document.createElement('div');
+            hComma.className = 'header-cell comma-header';
+            hComma.innerText = ',';
+            gridDiv.appendChild(hComma);
+
+            // Colonne decimali d, c, m
+            ['d', 'c', 'm'].forEach(dec => {
+                let hDec = document.createElement('div');
+                hDec.className = 'header-cell decimal-header';
+                hDec.innerText = dec;
+                gridDiv.appendChild(hDec);
+            });
+
+            // Colonna segno
+            let hSign = document.createElement('div');
+            hSign.className = 'header-cell sign-header';
+            hSign.innerText = 'SEGNO';
+            gridDiv.appendChild(hSign);
+
+            // 2. Righe dei numeri (4 righe)
+            for (let r = 1; r <= 4; r++) {
+                // Interi (0 a 8)
+                for (let c = 0; c < 9; c++) {
+                    let slot = document.createElement('div');
+                    slot.className = 'cell-slot';
+                    slot.setAttribute('data-row', r);
+                    slot.setAttribute('data-col', c);
+                    gridDiv.appendChild(slot);
+                }
+                // Cella virgola fissa (col 9)
+                let commaSlot = document.createElement('div');
+                commaSlot.className = 'cell-slot comma-slot';
+                commaSlot.innerText = ',';
+                gridDiv.appendChild(commaSlot);
+
+                // Celle decimali d, c, m (col 10, 11, 12)
+                for (let dc = 0; dc < 3; dc++) {
+                    let decSlot = document.createElement('div');
+                    decSlot.className = 'cell-slot decimal-slot';
+                    decSlot.setAttribute('data-row', r);
+                    decSlot.setAttribute('data-col', 10 + dc);
+                    gridDiv.appendChild(decSlot);
+                }
+
+                // Cella segno (col 13)
+                let signSlot = document.createElement('div');
+                signSlot.className = 'cell-slot sign-slot';
+                signSlot.setAttribute('data-row', r);
+                signSlot.setAttribute('data-col', '13');
+                gridDiv.appendChild(signSlot);
+            }
+            
+            // 3. Linea divisoria di risultato
+            let line = document.createElement('div');
+            line.className = 'column-line-row';
+            gridDiv.appendChild(line);
+            
+            // 4. Riga del risultato (1 sola riga: riga 5)
+            for (let c = 0; c < 14; c++) {
+                let slot = document.createElement('div');
+                if (c === 9) {
+                    slot.className = 'cell-slot comma-slot';
+                    slot.innerText = ',';
+                } else {
+                    slot.className = 'cell-slot';
+                    if (c > 9 && c < 13) slot.classList.add('decimal-slot');
+                    slot.setAttribute('data-row', '5');
+                    slot.setAttribute('data-col', c);
+                }
+                gridDiv.appendChild(slot);
+            }
+
+            attivaEventiCelleColonna();
+        }
+
+        // Gestione Lavagna Canvas
+        const canvas = document.getElementById('scratchpad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let canvasMode = 'pen'; // 'pen' o 'eraser'
+
+        function setCanvasMode(mode) {
+            canvasMode = mode;
+            document.getElementById('btn-pen').classList.toggle('active', mode === 'pen');
+            document.getElementById('btn-eraser').classList.toggle('active', mode === 'eraser');
+        }
+
+        function ridimensionaCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+        }
+
+        window.addEventListener('load', () => {
+            ridimensionaCanvas();
+            inizializzaGrigliaColonna();
+        });
+        window.addEventListener('resize', ridimensionaCanvas);
+
+        function getPosition(e) {
+            const rect = canvas.getBoundingClientRect();
+            if (e.touches && e.touches[0]) {
+                return {
+                    x: e.touches[0].clientX - rect.left,
+                    y: e.touches[0].clientY - rect.top
+                };
+            } else {
+                return {
+                    x: e.clientX - rect.left,
+                    y: e.clientY - rect.top
+                };
+            }
+        }
+
+        function configureContextStyles() {
+            if (canvasMode === 'eraser') {
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = 20; // Gomma più larga
+            } else {
+                ctx.strokeStyle = "#2c3e50";
+                ctx.lineWidth = 3;
+            }
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            configureContextStyles();
+            const pos = getPosition(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            const pos = getPosition(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        });
+
+        canvas.addEventListener('mouseup', () => { isDrawing = false; });
+        canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            configureContextStyles();
+            const pos = getPosition(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+        }, {passive: false});
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const pos = getPosition(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }, {passive: false});
+
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isDrawing = false;
+        }, {passive: false});
+
+        function pulisciLavagna() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Drag and Drop generale per le tessere numeriche/simboli
+        const tiles = document.querySelectorAll('.elements-pool .tile');
+        const dropZoneRiga = document.getElementById('drop-zone-riga');
+
+        tiles.forEach(tile => {
+            tile.addEventListener('dragstart', dragStart);
+            tile.addEventListener('touchstart', handleTouchStart, {passive: false});
+            tile.addEventListener('touchmove', handleTouchMove, {passive: false});
+            tile.addEventListener('touchend', handleTouchEnd, {passive: false});
+        });
+
+        dropZoneRiga.addEventListener('dragover', dragOver);
+        dropZoneRiga.addEventListener('drop', dropRiga);
+
+        let draggedElement = null;
+
+        function dragStart(e) {
+            draggedElement = e.target;
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+        }
+
+        function dropRiga(e) {
+            e.preventDefault();
+            if (!draggedElement) return;
+            aggiungiInRiga(draggedElement);
+        }
+
+        function aggiungiInRiga(element) {
+            const newTile = element.cloneNode(true);
+            newTile.setAttribute('draggable', 'false');
+            newTile.style.cursor = 'pointer';
+            newTile.style.width = '36px';
+            newTile.style.height = '36px';
+            newTile.style.fontSize = '1.2rem';
+            newTile.onclick = function() { this.remove(); }; 
+            dropZoneRiga.appendChild(newTile);
+        }
+
+        function attivaEventiCelleColonna() {
+            const slots = document.querySelectorAll('.cell-slot:not(.comma-slot)');
+            slots.forEach(slot => {
+                slot.addEventListener('dragover', dragOver);
+                slot.addEventListener('drop', (e) => {
+                    e.stopPropagation();
+                    if (draggedElement && slot.children.length === 0) {
+                        inserisciInCellaColonna(slot, draggedElement);
+                    }
+                });
+            });
+        }
+
+        function inserisciInCellaColonna(slot, element) {
+            const newTile = element.cloneNode(true);
+            newTile.setAttribute('draggable', 'false');
+            newTile.style.width = '24px';
+            newTile.style.height = '24px';
+            newTile.style.fontSize = '0.85rem';
+            newTile.style.cursor = 'pointer';
+            newTile.onclick = function() { 
+                this.remove(); 
+            };
+            slot.innerHTML = '';
+            slot.appendChild(newTile);
+        }
+
+        let activeTouchTile = null;
+        let touchOffsetX = 0;
+        let touchOffsetY = 0;
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            activeTouchTile = e.target.cloneNode(true);
+            activeTouchTile.style.position = 'fixed';
+            activeTouchTile.style.zIndex = '1000';
+            activeTouchTile.style.opacity = '0.8';
+            
+            const rect = e.target.getBoundingClientRect();
+            touchOffsetX = touch.clientX - rect.left;
+            touchOffsetY = touch.clientY - rect.top;
+
+            updateTouchPosition(touch);
+            document.body.appendChild(activeTouchTile);
+        }
+
+        function handleTouchMove(e) {
+            if (!activeTouchTile) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            updateTouchPosition(touch);
+        }
+
+        function handleTouchEnd(e) {
+            if (!activeTouchTile) return;
+            e.preventDefault();
+            
+            const touch = e.changedTouches[0];
+            const rectRiga = dropZoneRiga.getBoundingClientRect();
+            const wrapperCol = document.querySelector('.drop-zone-colonna-wrapper').getBoundingClientRect();
+
+            if (
+                touch.clientX >= rectRiga.left &&
+                touch.clientX <= rectRiga.right &&
+                touch.clientY >= rectRiga.top &&
+                touch.clientY <= rectRiga.bottom
+            ) {
+                aggiungiInRiga(activeTouchTile);
+            } else if (
+                touch.clientX >= wrapperCol.left &&
+                touch.clientX <= wrapperCol.right &&
+                touch.clientY >= wrapperCol.top &&
+                touch.clientY <= wrapperCol.bottom
+            ) {
+                const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+                const targetSlot = elementUnder ? elementUnder.closest('.cell-slot:not(.comma-slot)') : null;
+                if (targetSlot && targetSlot.children.length === 0) {
+                    inserisciInCellaColonna(targetSlot, activeTouchTile);
+                }
+            }
+
+            if(activeTouchTile) {
+                activeTouchTile.remove();
+                activeTouchTile = null;
+            }
+        }
+
+        function updateTouchPosition(touch) {
+            activeTouchTile.style.left = (touch.clientX - touchOffsetX) + 'px';
+            activeTouchTile.style.top = (touch.clientY - touchOffsetY) + 'px';
+        }
+
+        function verificaOperazione() {
+            let numeriStr = [];
+            let segno = '+';
+
+            // Lettura griglia in colonna per i numeri di inserimento (righe 1-4)
+            for (let r = 1; r <= 4; r++) {
+                let numIntero = "";
+                let numDecimale = "";
+                let rigaVuota = true;
+                
+                let cellaSegno = document.querySelector(`.cell-slot[data-row="${r}"][data-col="13"]`);
+                if (cellaSegno && cellaSegno.children.length > 0) {
+                    let s = cellaSegno.children[0].innerText.trim();
+                    if (['+', '-', '×', ':'].includes(s)) {
+                        segno = s;
+                    }
+                }
+
+                // Lettura parte intera (col 0 a 8)
+                for (let c = 0; c < 9; c++) {
+                    let cella = document.querySelector(`.cell-slot[data-row="${r}"][data-col="${c}"]`);
+                    if (cella && cella.children.length > 0) {
+                        let val = cella.children[0].innerText.trim();
+                        if (!isNaN(val) && val !== ',') {
+                            numIntero += val;
+                            rigaVuota = false;
+                        }
+                    }
+                }
+
+                // Lettura parte decimale (d, c, m -> col 10, 11, 12)
+                for (let dc = 0; dc < 3; dc++) {
+                    let cella = document.querySelector(`.cell-slot[data-row="${r}"][data-col="${10 + dc}"]`);
+                    if (cella && cella.children.length > 0) {
+                        let val = cella.children[0].innerText.trim();
+                        if (!isNaN(val) && val !== ',') {
+                            numDecimale += val;
+                            rigaVuota = false;
+                        }
+                    }
+                }
+
+                if (!rigaVuota) {
+                    let interoSuit = numIntero === "" ? "0" : numIntero;
+                    let numeroFinaleStr = interoSuit + (numDecimale.length > 0 ? "." + numDecimale : "");
+                    numeriStr.push(numeroFinaleStr);
+                }
+            }
+
+            // Lettura riga del risultato (riga 5)
+            let resIntero = "";
+            let resDecimale = "";
+            for (let c = 0; c < 9; c++) {
+                let cella = document.querySelector(`.cell-slot[data-row="5"][data-col="${c}"]`);
+                if (cella && cella.children.length > 0) {
+                    let val = cella.children[0].innerText.trim();
+                    if (!isNaN(val) && val !== ',') resIntero += val;
+                }
+            }
+            for (let dc = 0; dc < 3; dc++) {
+                let cella = document.querySelector(`.cell-slot[data-row="5"][data-col="${9 + dc}"]`);
+                if (cella && cella.children.length > 0) {
+                    let val = cella.children[0].innerText.trim();
+                    if (!isNaN(val) && val !== ',') resDecimale += val;
+                }
+            }
+
+            let risultatoInseritoStr = (resIntero === "" ? "0" : resIntero) + (resDecimale.length > 0 ? "." + resDecimale : "");
+
+            const feedback = document.getElementById('feedback-msg');
+
+            if (numeriStr.length === 0) {
+                feedback.style.color = "#d63031";
+                feedback.innerHTML = "⚠️ Inserisci almeno un numero nella griglia in colonna!";
+                return;
+            }
+
+            if (resIntero === "" && resDecimale === "") {
+                feedback.style.color = "#d63031";
+                feedback.innerHTML = "⚠️ Inserisci il risultato nella riga in basso!";
+                return;
+            }
+
+            let numeri = numeriStr.map(n => parseFloat(n));
+            let risultatoInserito = parseFloat(risultatoInseritoStr);
+
+            let risultatoEsatto = numeri[0];
+            for (let i = 1; i < numeri.length; i++) {
+                if (segno === '+') risultatoEsatto += numeri[i];
+                else if (segno === '-') risultatoEsatto -= numeri[i];
+                else if (segno === '×') risultatoEsatto *= numeri[i];
+                else if (segno === ':') {
+                    if (numeri[i] === 0) {
+                        feedback.style.color = "#d63031";
+                        feedback.innerHTML = "⚠️ Impossibile dividere per zero!";
+                        return;
+                    }
+                    risultatoEsatto /= numeri[i];
+                }
+            }
+
+            risultatoEsatto = Math.round(risultatoEsatto * 10000) / 10000;
+            risultatoInserito = Math.round(risultatoInserito * 10000) / 10000;
+
+            if (risultatoInserito === risultatoEsatto) {
+                feedback.style.color = "#00b894";
+                feedback.innerHTML = "🎉 Bravissimo! L'operazione è corretta!";
+                tentativiErrati = 0;
+            } else {
+                tentativiErrati++;
+                
+                if (tentativiErrati >= 3) {
+                    feedback.style.color = "#e17055";
+                    feedback.innerHTML = `💡 Dopo 3 tentativi, ecco l'aiuto: il risultato corretto è <strong>${risultatoEsatto}</strong>`;
+                    tentativiErrati = 0;
+                } else {
+                    feedback.style.color = "#e74c3c";
+                    feedback.innerHTML = `❌ Riprova! (Tentativo ${tentativiErrati} di 3)`;
+                }
+            }
+        }
+
+        function pulisciOperazione() {
+            document.getElementById('feedback-msg').innerHTML = '';
+            tentativiErrati = 0;
+            dropZoneRiga.innerHTML = '';
+            pulisciLavagna();
+            inizializzaGrigliaColonna();
+        }
+
+        function pulisciTutto() {
+            if(confirm("Vuoi davvero cancellare tutto l'esercizio?")) {
+                document.querySelectorAll('textarea').forEach(ta => ta.value = '');
+                document.getElementById('titolo-input').value = '';
+                document.getElementById('nome-input').value = '';
+                pulisciOperazione();
+            }
+        }
+
+        // =====================================================================
+        // FUNZIONE "FINE FAI .JPEG": screenshot della scheda + invio a Google Drive
+        // =====================================================================
+
+        // ⚠️ CONFIGURAZIONE OBBLIGATORIA ⚠️
+        // Per poter inviare il file al Drive dell'utente serve un "Client ID" OAuth
+        // gratuito, creato dall'insegnante/genitore su Google Cloud Console.
+        // Istruzioni complete più sotto nella chat. Incolla qui il tuo Client ID:
+        const GOOGLE_CLIENT_ID = "INSERISCI_QUI_IL_TUO_CLIENT_ID.apps.googleusercontent.com";
+        const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+
+        let tokenClient = null;
+        let accessToken = null;
+
+        function impostaStatoDrive(msg, colore) {
+            const el = document.getElementById('drive-status');
+            el.style.color = colore || '#2c3e50';
+            el.innerHTML = msg;
+        }
+
+        function inizializzaGoogleAuth() {
+            if (tokenClient || typeof google === 'undefined' || !google.accounts) return;
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: GOOGLE_CLIENT_ID,
+                scope: DRIVE_SCOPE,
+                callback: '' // impostato dinamicamente al momento della richiesta
+            });
+        }
+        window.addEventListener('load', inizializzaGoogleAuth);
+
+        async function fineFaiJpeg() {
+            if (GOOGLE_CLIENT_ID.indexOf("INSERISCI_QUI") === 0) {
+                impostaStatoDrive(
+                    "⚠️ Devi prima configurare il Client ID di Google (vedi istruzioni fornite). Nel frattempo scarico solo l'immagine sul dispositivo.",
+                    "#d63031"
+                );
+                await scaricaSoloJpeg();
+                return;
+            }
+
+            impostaStatoDrive("📸 Sto creando l'immagine della scheda...", "#0984e3");
+
+            let canvas;
+            try {
+                canvas = await html2canvas(document.querySelector('.container'), {
+                    backgroundColor: "#f0f8ff",
+                    scale: 2,
+                    useCORS: true
+                });
+            } catch (err) {
+                impostaStatoDrive("❌ Errore nella creazione dell'immagine: " + err.message, "#d63031");
+                return;
+            }
+
+            canvas.toBlob(async function(blob) {
+                if (!blob) {
+                    impostaStatoDrive("❌ Errore nella conversione in JPEG.", "#d63031");
+                    return;
+                }
+
+                impostaStatoDrive("🔐 Accedi con Google per autorizzare l'invio al tuo Drive...", "#0984e3");
+
+                if (!tokenClient) {
+                    inizializzaGoogleAuth();
+                    if (!tokenClient) {
+                        impostaStatoDrive("❌ Servizio Google non disponibile. Scarico l'immagine in locale.", "#d63031");
+                        salvaJpegLocale(blob);
+                        return;
+                    }
+                }
+
+                tokenClient.callback = async (resp) => {
+                    if (resp.error) {
+                        impostaStatoDrive("❌ Accesso a Google annullato o non riuscito. Scarico l'immagine in locale.", "#d63031");
+                        salvaJpegLocale(blob);
+                        return;
+                    }
+                    accessToken = resp.access_token;
+                    await caricaSuDrive(blob, accessToken);
+                };
+
+                tokenClient.requestAccessToken({ prompt: accessToken ? '' : 'consent' });
+            }, 'image/jpeg', 0.92);
+        }
+
+        async function caricaSuDrive(blob, token) {
+            impostaStatoDrive("⬆️ Invio in corso al tuo Google Drive...", "#0984e3");
+
+            const nomeFile = "storia-matematica-" + new Date().toISOString().slice(0,19).replace(/[:T]/g,'-') + ".jpeg";
+            const metadata = { name: nomeFile, mimeType: "image/jpeg" };
+
+            const form = new FormData();
+            form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+            form.append('file', blob);
+
+            try {
+                const res = await fetch(
+                    'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink',
+                    {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token },
+                        body: form
+                    }
+                );
+                const data = await res.json();
+                if (data.id) {
+                    impostaStatoDrive(
+                        "✅ Immagine inviata su Google Drive! " +
+                        (data.webViewLink ? `<a href="${data.webViewLink}" target="_blank">Aprila qui</a>` : ""),
+                        "#00b894"
+                    );
+                } else {
+                    impostaStatoDrive("❌ Errore durante l'invio a Drive: " + JSON.stringify(data), "#d63031");
+                    salvaJpegLocale(blob);
+                }
+            } catch (err) {
+                impostaStatoDrive("❌ Errore di rete durante l'invio a Drive: " + err.message, "#d63031");
+                salvaJpegLocale(blob);
+            }
+        }
+
+        function salvaJpegLocale(blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "storia-matematica.jpeg";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        async function scaricaSoloJpeg() {
+            const canvas = await html2canvas(document.querySelector('.container'), {
+                backgroundColor: "#f0f8ff",
+                scale: 2,
+                useCORS: true
+            });
+            canvas.toBlob(blob => salvaJpegLocale(blob), 'image/jpeg', 0.92);
+        }
+    </script>
+</body>
+</html>
